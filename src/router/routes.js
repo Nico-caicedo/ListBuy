@@ -10,7 +10,7 @@ const routes = [
     path: '/registro', // Cambiado a minúsculas por convención
     component: () => import('pages/RegistroUser.vue'),
     children: [
-      { path: '', component: () => import('pages/RegistroUser.vue') }, // Cambiado a una ruta relativa
+      // { path: '', component: () => import('pages/RegistroUser.vue') },  Cambiado a una ruta relativa
     ]
   },
   {

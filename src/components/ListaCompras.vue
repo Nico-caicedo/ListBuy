@@ -10,6 +10,7 @@
       :selected-rows-label="getSelectedString"
       selection="multiple"
       v-model:selected="selected"
+      no-data-label="Sin productos agregados"
     />
 
     <div class="q-mt-md">Selected: {{ JSON.stringify(selected) }}</div>
@@ -36,17 +37,24 @@ const columns = [
     field: "prioridad",
     sortable: true,
   },
+  {
+    name: "invisibleValue",
+    field: "invisibleValue",
+    visible: false, // Esta columna no será visible en la tabla
+  },
 ];
 
 const rows = [
-  {
-    name: "Donut",
-    prioridad: "medio",
-  },
-  {
-    name: "KitKat",
-    prioridad: "Importante",
-  }
+  // {
+  //   name: "Donut",
+  //   prioridad: "medio",
+  //   invisibleValue: "Este es un valor invisible para el usuario",
+  // },
+  // {
+  //   name: "KitKat",
+  //   prioridad: "Importante",
+  //   invisibleValue: "Este es un valor invisible para el usuario",
+  // }
 ];
 
 export default {

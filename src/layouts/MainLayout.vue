@@ -28,7 +28,7 @@
           />
         </template>
       </q-input>
-      <div>
+      <div class="row  flex-center q-gutter-md">
         <q-btn label="Enviar" type="submit" color="primary" />
         <q-btn
           to="/registro"
@@ -73,7 +73,7 @@ export default {
         .post("https://localhost:7214/api/Users/ValidarUsuario", data)
         .then((response) => {
           console.log(response.data);
-          $q.localStorage.set("hola", data);
+          $q.localStorage.set("hola", response.data);
           router.push("/lista");
         })
         .catch((error) => {
