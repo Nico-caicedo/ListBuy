@@ -30,6 +30,15 @@
                 (val) => (val && val.length > 0) || 'Please type something',
               ]"
             />
+            <q-input
+              filled
+              v-model="apellido"
+              label="Apellido"
+              lazy-rules
+              :rules="[
+                (val) => (val && val.length > 0) || 'Please type something',
+              ]"
+            />
 
             <q-input
               filled
@@ -50,7 +59,7 @@
               </template>
             </q-input>
 
-            <q-toggle v-model="accept" label="I accept the license and terms" />
+            <q-toggle v-model="accept" label="Acepto la licencia y los términos." />
 
             <div class="row  flex-center q-gutter-md">
               <q-btn label="Enviar" type="submit" color="positive" />
@@ -76,6 +85,7 @@ export default {
     const accept = ref(false);
     const myform = ref(null);
     const router = useRouter();
+    const apellido = ref("")
 
     const procesarFormulario = () => {
       if (accept.value === false) {
@@ -89,6 +99,7 @@ export default {
         const data = {
           nombre: nombre.value,
           clave: clave.value,
+          apellido: apellido.value
         };
 
         axios
@@ -128,6 +139,7 @@ export default {
     const reset = () => {
       nombre.value = null;
       clave.value = null;
+      apellido.value = null;
       accept.value = false;
     };
 
@@ -143,6 +155,7 @@ export default {
       reset,
       returns,
       myform,
+      apellido
     };
   },
 };
