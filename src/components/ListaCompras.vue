@@ -48,8 +48,10 @@
             v-for="column in columns"
             :key="column.name"
             :data-label="column.label"
+            @click="hola(props.row)"
           >
             {{ props.row[column.name] }}
+            
             <q-popup-edit
               v-if="column.name === 'prioridad'"
               v-model="props.row[column.name]"
@@ -81,10 +83,20 @@
                 v-model="scope.value"
                 dense
                 autofocus
-                @keyup.enter="scope.set" 
+                @keyup.enter="scope.set"
               />
             </q-popup-edit>
+            <template v-if="column.name === 'actions'">
+      <q-btn icon="delete" @click="DeleteProdcuto(props.row)" color="negative"/>
+    </template>
+    <!-- <template v-if="column.name === 'edit'">
+      <q-btn icon="edit" @click="deleteItem(props.row)" color="negative"/>
+    </template> -->
+
           </q-td>
+          <!-- <q-td v-if="column.name === 'actions'">
+            <q-btn icon="delete" @click="deleteItem(props.row)"> </q-btn>
+          </q-td> -->
         </q-tr>
       </template>
     </q-table>
@@ -103,14 +115,30 @@ export default {
           name: "producto1",
           label: "Producto",
           field: "producto1",
-          align: "left",
+          align: "center",
+          sortable: true,
         },
         {
           name: "prioridad",
           label: "Prioridad",
           field: "prioridad",
-          align: "left",
+          align: "center",
+          sortable: true,
         },
+        {
+          name: "actions",
+          label: "Acciones",
+          field: "actions",
+          align: "center",
+          sortable: true,
+        },
+        // {
+        //   name: "edit",
+        //   label: "editar",
+        //   field: "edit",
+        //   align: "center",
+        //   sortable: true,
+        // },
       ],
       rows: [],
       DatosProducto: {
@@ -124,10 +152,32 @@ export default {
   },
 
   methods: {
+    hola(){
+      alert(data)
+    },
+    DeleteProdcuto(data){
+
+      const idDelete = data.id;
+      this.$axios
+        .delete(
+          `https://localhost:7214/api/Productos/delete/${idDelete}`
+        )
+        .then((response) => {
+          this.q.notify({
+            color: "green-4",
+            textColor: "white",
+            icon: "cloud_done",
+            message: "Eliminación Éxitosa",
+          });
+         
+          this.getAll();
+        })
+        .catch((error) => {
+          console.error("Error al enviar datos:", error);
+        });
+    },
     handleSavess(d1, d2) {
-
-      console.log(d1,d2)
-
+      console.log(d1, d2);
 
       this.$axios
         .put("https://localhost:7214/api/Productos/EditPrduct", d1)

@@ -28,7 +28,7 @@
           />
         </template>
       </q-input>
-      <div class="row  flex-center q-gutter-md">
+      <div class="row flex-center q-gutter-md">
         <q-btn label="Enviar" type="submit" color="primary" />
         <q-btn
           to="/registro"
@@ -38,62 +38,92 @@
         />
       </div>
     </q-form>
+    <q-dialog v-model="alert">
+      <q-card>
+        <q-card-section>
+          <div class="text-h6">Alert</div>
+        </q-card-section>
+
+        <q-card-section class="q-pt-none">
+          {{ prueba }}
+        </q-card-section>
+
+        <q-card-actions align="right">
+          <q-btn flat label="OK" color="primary" v-close-popup />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
   </div>
 </template>
 
 <script>
-import { ref } from "vue";
+import { ref, onBeforeUnmount } from "vue";
 import axios from "axios";
 import { useRouter } from "vue-router";
 import { useQuasar } from "quasar";
 
 export default {
-  setup() {
-    const password = ref("");
-    const user = ref("");
-    const isPwd = ref(true);
-    // const usuario = "Nicolas";
-    // const clave = "Nico20025";
+  data() {
+    return {
+      password: "",
+      user: "",
+      isPwd: ref(true),
+      router: useRouter(),
+      q: useQuasar(),
+      timer: null,
+      prueba: "",
+      alert: false,
+    };
+  },
 
-    const router = useRouter();
-    const $q = useQuasar();
+  methods: {
+    validar() {
+      this.showLoading();
 
-    // $q.localStorage.set(key, value);
-    // const value = $q.localStorage.getItem(key);
-
-    // $q.sessionStorage.set(key, value);
-    // const otherValue = $q.sessionStorage.getItem(key);
-
-    const validar = () => {
       const data = {
-        NombreUsuario: user.value,
-        Clave: password.value,
+        NombreUsuario: this.user,
+        Clave: this.password,
       };
+
       axios
         .post("https://localhost:7214/api/Users/ValidarUsuario", data)
         .then((response) => {
           console.log(response.data);
-          $q.localStorage.set("hola", response.data);
-          router.push("/lista");
+          this.q.localStorage.set("hola", response.data);
+          this.router.push("/lista");
         })
         .catch((error) => {
-          console.error("Error al enviar datos:", error);
-          $q.notify({
-          type: 'negative',
-          message: 'Usuario o contraseña incorrectos'
+          // console.error("Error al enviar datos:", error.response.data.mensaje);
+          // this.q.notify({
+          //   type: "negative",
+          //   message: "Algo salio mal, intentalo de nuevo",
+          // });
+          this.prueba = error.response.data.mensaje
+          this.alert = true
         })
+        .finally(() => {
+          this.hideLoading();
         });
+    },
 
+    showLoading() {
+      this.timer = setTimeout(() => {
+        this.q.loading.show({
+          message: "Validando usuario...",
+          boxClass: "bg-grey-2 text-grey-9",
+          spinnerColor: "primary",
+        });
+      }, 0);
+    },
 
-    };
+    hideLoading() {
+      clearTimeout(this.timer);
+      this.q.loading.hide();
+    },
+  },
 
-    return {
-      user,
-      password,
-      isPwd,
-      validar,
-      
-    };
+  onBeforeUnmount() {
+    this.hideLoading();
   },
 };
 </script>

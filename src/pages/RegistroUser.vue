@@ -59,11 +59,14 @@
               </template>
             </q-input>
 
-            <q-toggle v-model="accept" label="Acepto la licencia y los términos." />
+            <q-toggle
+              v-model="accept"
+              label="Acepto la licencia y los términos."
+            />
 
-            <div class="row  flex-center q-gutter-md">
+            <div class="row flex-center q-gutter-md">
               <q-btn label="Enviar" type="submit" color="positive" />
-              <q-btn label="regresar" @click="returns"  color="primary" />
+              <q-btn label="regresar" @click="returns" color="primary" />
             </div>
           </q-form>
         </div>
@@ -77,19 +80,24 @@ import { useQuasar } from "quasar";
 import axios from "axios";
 import { useRouter } from "vue-router";
 export default {
-  setup() {
-    const $q = useQuasar();
-    const isPwd = ref(true);
-    const nombre = ref("");
-    const clave = ref("");
-    const accept = ref(false);
-    const myform = ref(null);
-    const router = useRouter();
-    const apellido = ref("")
-
-    const procesarFormulario = () => {
-      if (accept.value === false) {
-        $q.notify({
+  data() {
+    return {
+      q: useQuasar(),
+      isPwd: ref(true),
+      nombre: "",
+      clave: "",
+      accept: false,
+      myform: {},
+      router: useRouter(),
+      apellido: "",
+      timer: null,
+    };
+  },
+  methods: {
+    procesarFormulario() {
+      this.showLoading();
+      if (this.accept === false) {
+        this.q.notify({
           color: "red-5",
           textColor: "white",
           icon: "warning",
@@ -97,21 +105,21 @@ export default {
         });
       } else {
         const data = {
-          nombre: nombre.value,
-          clave: clave.value,
-          apellido: apellido.value
+          nombre: this.nombre,
+          clave: this.clave,
+          apellido: this.apellido,
         };
 
         axios
           .post("https://localhost:7214/api/Users/AddUser", data)
           .then((response) => {
-            $q.notify({
+            this.q.notify({
               color: "green-4",
               textColor: "white",
               icon: "cloud_done",
               message: "Registrado con Éxito",
             });
-            myform.value.reset();
+            this.reset();
           })
           .catch((error) => {
             // console.error("Error al enviar datos:", error);
@@ -121,42 +129,51 @@ export default {
               error.response.data.mensaje
             ) {
               // Mostrar el mensaje personalizado desde el servidor
-              $q.notify({
+              this.q.notify({
                 type: "negative",
                 message: error.response.data.mensaje,
               });
             } else {
               // Si no hay un mensaje personalizado, mostrar un mensaje genérico
-              $q.notify({
+              this.q.notify({
                 type: "negative",
                 message: "Error al procesar la solicitud",
               });
             }
+          })
+          .finally(() => {
+            this.hideLoading();
           });
       }
-    };
+    },
 
-    const reset = () => {
-      nombre.value = null;
-      clave.value = null;
-      apellido.value = null;
-      accept.value = false;
-    };
+    reset() {
+      this.nombre = null;
+      this.clave = null;
+      this.apellido = null;
+      this.accept = false;
+    },
 
-    const returns = () =>{
-      router.go(-1)
-    }
-    return {
-      accept,
-      nombre,
-      clave,
-      isPwd,
-      procesarFormulario,
-      reset,
-      returns,
-      myform,
-      apellido
-    };
+    returns() {
+      this.router.go(-1);
+    },
+    showLoading() {
+      this.timer = setTimeout(() => {
+        this.q.loading.show({
+          message: "Validando usuario...",
+          boxClass: "bg-grey-2 text-grey-9",
+          spinnerColor: "primary",
+        });
+      }, 0);
+    },
+
+    hideLoading() {
+      clearTimeout(this.timer);
+      this.q.loading.hide();
+    },
+  },
+  onBeforeUnmount() {
+    this.hideLoading();
   },
 };
 </script>
